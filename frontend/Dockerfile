@@ -2,15 +2,17 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# copy package files
+# Copy package files
 COPY package*.json ./
 RUN npm install
 
-# copy src
-COPY  . .
+# Copy source code
+COPY . .
 
+# Build the app
 RUN npm run build
 
+# Install serve to run the built app
 RUN npm install -g serve
 
 EXPOSE 3000
