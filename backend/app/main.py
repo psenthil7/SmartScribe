@@ -200,3 +200,6 @@ async def create_note(note: NoteCreate):
     notes_db.append(new_note.dict())
     return new_note
     
+@app.get("/api/notes")
+async def get_notes():
+    return {"notes": notes_db}
