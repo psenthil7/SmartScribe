@@ -178,8 +178,18 @@ async def procces_ocr(filename: str):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         denoised = cv2.medianBlur(gray, 3)
         _, threshold = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    
-        text = pytesseract.image_to_string(threshold)
-        cleaned_text = text.strip() 
 
-        
+        #extract text
+        text = pytesseract.image_to_string(threshold)
+        cleaned_text = text.strip() # clean any whitespace
+
+        return {
+            "filename": filename,
+            "extracted_text": cleaned_text,
+            "confidence": "OCR processing completed",
+            "character_count": len(cleaned_text)
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OCR processing failed")
+    
