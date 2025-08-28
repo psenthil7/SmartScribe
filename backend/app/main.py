@@ -7,7 +7,8 @@ import uuid
 import cv2
 import pytesseract
 from PIL import Image
-import numpy as np
+import numpy as np 
+from app.models.note import NoteCreate, NoteResponse
 
 app = FastAPI(title="SmartScribe", version="1.0.0")
 
@@ -28,17 +29,6 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
-
-# structure for creating a note
-class NoteCreate(BaseModel):
-    title: str
-    content: str
-
-# structure for what server sends back
-class Note(BaseModel):
-    id: int
-    title: str
-    content: str
 
 # retrieves all notes
 @app.get("/api/notes") 
