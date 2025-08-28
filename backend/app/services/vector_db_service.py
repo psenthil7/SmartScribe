@@ -9,3 +9,12 @@ class VectorDBService:
             persist_directory="./chroma_db" # save to folder
         ))
         self.collection = self.client.get_or_create_collection("notes")
+    
+    # stores note with given parameters
+    def store_notes(self, note_id: str, content: str, embedding: List[float], metadata: Dict[str, Any]):
+        self.collection.add(
+            embeddings = [embedding],
+            documents = [content],
+            metadatas = [metadata],
+            ids = [note_id]
+        )
