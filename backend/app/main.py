@@ -193,3 +193,18 @@ async def procces_ocr(filename: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OCR processing failed")
     
+# processing and creating a note in one step
+@app.post("/api/upload-and-process")
+async def upload_and_process(file: UploadFile = File(...)):
+    """Upload a file and immediately process it with OCR"""
+
+    if not is_allowed_file(file.filename):
+        allowed_extensions = []
+        for extensions in ALLOWED_EXTENSIONS.values():
+            allowed_extensions.extend(extensions)
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type not allowed. Allowed extensions: {', '.join(allowed_extensions)}"
+        )
+    
+    
