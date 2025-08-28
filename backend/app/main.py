@@ -28,5 +28,14 @@ class NoteCreate(BaseModel):
     title: str
     content: str
 
-# structr
+# structure for what server sends back
 class Note(BaseModel):
+    id: int
+    title: str
+    content: str
+
+@app.get("/api/notes") 
+async def get_notes():
+    """Get all notes (placeholder for now)"""
+    return {"notes" : [], "message" : "No notes yet"}
+
