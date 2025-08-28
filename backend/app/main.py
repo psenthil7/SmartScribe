@@ -184,4 +184,19 @@ async def process_ocr(filename: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OCR processing failed")
+
+notes_db = [] # for in memory storage
+
+@app.post("/api/notes", response_model=NoteResponse)
+async def create_note(note: NoteCreate):
+    note_id = str(uuid.uuid4())
+    new_note = NoteResponse(
+        id = note_id,
+        title = note.title, 
+        content = note.content,
+        filename = note.filename,
+        created_at = datetime.now()
+    )
+    notes_db.append(new_note.dict())
+    return new_note
     
