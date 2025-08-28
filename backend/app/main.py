@@ -115,4 +115,15 @@ async def upload_note_file(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save fule: {str(e)}")
 
+    # get file type for processing
+    file_type = get_file_type(file.filename)
+
+    return {
+        "message": "File uploaded successfully",
+        "filename": unique_filename,
+        "original_name": file.filename,
+        "file_path": file_path,
+        "file_type": file_type,
+        "size_bytes": len(content)
+    }
 
