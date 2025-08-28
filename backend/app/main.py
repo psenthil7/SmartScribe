@@ -134,7 +134,7 @@ async def list_uploaded_files():
     upload_dir = "uploads"
 
     # if directory doesn't exist, return empty value
-    if not os.path.exists(upload_dir)
+    if not os.path.exists(upload_dir):
         return {"files": []}
 
     files = []
