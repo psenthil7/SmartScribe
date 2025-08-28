@@ -1,4 +1,5 @@
 {
     "javascript.suggest.enabled": false,
-    "typescript.suggest.enabled": false
+    "typescript.suggest.enabled": false,
+    "python.REPL.enableREPLSmartSend": false
 }
