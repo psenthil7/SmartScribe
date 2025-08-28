@@ -169,5 +169,15 @@ async def procces_ocr(filename: str):
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {filename} not found")
     
+    try: 
+        image = cv2.imread(file_path)
+        if image is None:
+            raise HTTPException(status_code=400, detail=f"Invalid image file")
+        
+        # grayscale so its easier for OCR
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        denoised = cv2.medianBlur(gray, 3)
+        _, threshold = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
     
 
