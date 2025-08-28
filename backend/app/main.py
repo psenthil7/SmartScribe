@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File 
 from fastapi.middleware.cors import CORSMiddleware 
 from pydantic import BaseModel # for data validation 
-from typing import List
+from typing import List, Dict
 import os
 import uuid
 import cv2
@@ -261,3 +261,18 @@ async def search_notes(query: str, n_results: int = 3):
         "query": query,
         "results": results
     }
+
+class FlashcardService:
+    def generate_flashcards(self, content: str) -> List[Dict[str, str]]:
+        # Placeholder, creating simple flashcards for now
+
+        sentences = content.split('.')
+        flashcards = []
+        
+        for i, sentence in enumerate(sentences[:5]): # limit to 5 flashcards
+            if len(sentence.strip()) > 20:
+                question = f"What is the main point about: {sentence[:50]}...?"
+                answer = sentence.strip()
+                flashcards.append({"question": question, "answer": answer})
+        
+        return flashcards
