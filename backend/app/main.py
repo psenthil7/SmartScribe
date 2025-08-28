@@ -9,6 +9,7 @@ import pytesseract
 from PIL import Image
 import numpy as np 
 from app.models.note import NoteCreate, NoteResponse
+from datetime import datetime
 
 app = FastAPI(title="SmartScribe", version="1.0.0")
 
