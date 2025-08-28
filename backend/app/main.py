@@ -263,3 +263,21 @@ async def search_notes(query: str, n_results: int = 3):
         "results": results
     }
 
+flashcard_service = FlashcardService()
+
+@app.post("/api/generate-flashcards")
+async def generate_flashcards(note_id: str):
+
+    # Find note in database
+    note = next((n for n in notes_db if n["id"] == note_id), None)
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+    
+    # create flashcards
+    flashcards = flashcard_service.generate_flashcards(note["content"])
+
+    return {
+        "note_id": note_id,
+        "flashcards": flashcards
+    }
+
