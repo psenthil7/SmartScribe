@@ -11,6 +11,7 @@ import numpy as np
 from app.models import NoteCreate, NoteResponse, OCRResponse, UploadResponse
 from datetime import datetime
 from app.services.embedding_service import EmbeddingService
+from app.services.vector_db_service import VectorDBService
 
 app = FastAPI(title="SmartScribe", version="1.0.0")
 
@@ -214,3 +215,18 @@ async def generate_embeddings(text: str):
         "embedding": embedding,
         "dimensions": len(embedding)
     }
+
+
+vector_db = VectorDBService()
+
+@app.post("/api/store-note-with-embeddings")
+async def store_note_with_embeddings(note: NoteCreate):
+    # convert text to embedding 
+    embedding = embedding_service.generate_embedding(note.content)
+    
+    # store in vector db
+    note_id = str(uuid.uuid4())
+    metadata = {"title": note.title, "filename": note.filename}
+    vector_db.store_note(note_id, note.content, embedding, metadata)
+
+    return {"message": "Note stored with embeddings", "note_id": note_id}
