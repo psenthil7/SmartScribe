@@ -2,9 +2,6 @@
 
 A full-stack web application that converts handwritten notes to text via OCR, generates embeddings, stores them in Chroma vector database, and enables semantic search and flashcard generation.
 
-## Learning Path
-
-This project is designed to teach you modern full-stack development with AI integration. Follow the steps below to build your understanding progressively.
 
 ### Phase 1: Foundation
 - [ ] Project structure setup
