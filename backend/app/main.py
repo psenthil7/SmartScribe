@@ -10,6 +10,7 @@ from PIL import Image
 import numpy as np 
 from app.models import NoteCreate, NoteResponse, OCRResponse, UploadResponse
 from datetime import datetime
+from app.services.embedding_service import EmbeddingService
 
 app = FastAPI(title="SmartScribe", version="1.0.0")
 
@@ -203,3 +204,13 @@ async def create_note(note: NoteCreate):
 @app.get("/api/notes")
 async def get_notes():
     return {"notes": notes_db}
+
+embedding_service = EmbeddingService()
+
+@app.pot("/api/generate_embeddings")
+async def generate_embeddings(text: str):
+    embedding = embedding_service.generate_embeddings(text)
+    return {
+        "embedding": embedding,
+        "dimensions": len(embedding)
+    }
