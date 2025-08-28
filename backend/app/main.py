@@ -15,7 +15,7 @@ app = FastAPI(title="SmartScribe", version="1.0.0")
 # configuring CORS middleware 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://localhost:3000"], #requests from React frontend can be made to the backend 
+    allow_origins=["http://localhost:3000"], #requests from React frontend can be made to the backend 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -148,7 +148,7 @@ async def list_uploaded_files():
 
 # OCR processing 
 @app.post("/api/process-ocr/{filename}")
-async def procces_ocr(filename: str):
+async def process_ocr(filename: str):
     """Processes uploaded file with OCR to extract text"""
 
     # creates path to uploaded file in uploads directory
