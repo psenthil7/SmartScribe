@@ -39,3 +39,14 @@ async def get_notes():
     """Get all notes (placeholder for now)"""
     return {"notes" : [], "message" : "No notes yet"}
 
+@app.post("/api/notes")
+async def create_note(note: NoteCreate):
+    """Create a new note"""
+
+    return {
+        "id": 1,
+        "title": note.title,
+        "content": note.content,
+        "message": "Note created successfully"
+    }
+
