@@ -18,3 +18,11 @@ class VectorDBService:
             metadatas = [metadata],
             ids = [note_id]
         )
+    
+    # searches similar note embeddings
+    def search_similar(self, query_embedding: List[float], n_results: int = 5):
+        results = self.collection.query(
+            query_embeddings = [query_embedding],
+            n_results = n_results
+        )
+        return results
