@@ -127,3 +127,27 @@ async def upload_note_file(file: UploadFile = File(...)):
         "size_bytes": len(content)
     }
 
+@app.get("/api/files")
+async def list_uploaded_files():
+    """List all uploaded files with their types"""
+
+    upload_dir = "uploads"
+
+    # if directory doesn't exist, return empty value
+    if not os.path.exists(upload_dir)
+        return {"files": []}
+
+    files = []
+    for filename in os.listdir(upload_dir):
+        file_path = os.path.join(upload_dir, filename)
+        if os.path.isfile(file_path):
+            file_type = get_file_type(filename)
+            file_size = os.path.getsize(file_path)
+            files.append({
+                "filename": filename,
+                "path": file_path,
+                "type": file_type,
+                "size_bytes": file_size
+            })
+    
+    return {"files": files}
