@@ -50,3 +50,14 @@ async def create_note(note: NoteCreate):
         "message": "Note created successfully"
     }
 
+@app.get(f"/api/notes/{note_id}")
+async def get_note(note_id: int):
+    """Get a specific note by ID"""
+
+    return {
+        "id": note_id,
+        "title": f"Sample Note {note_id}",
+        "content": "This is a sample note content",
+        "message": "Note retrieved successfully"
+    }
+
