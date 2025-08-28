@@ -4,6 +4,10 @@ from pydantic import BaseModel # for data validation
 from typing import List
 import os
 import uuid
+import cv2
+import pytesseract
+from PIL import Image
+import numpy as np
 
 app = FastAPI(title="SmartScribe", version="1.0.0")
 
@@ -150,4 +154,7 @@ async def list_uploaded_files():
                 "size_bytes": file_size
             })
     
-    return {"files": files}
+    return {"files": files} 
+
+# OCR processing 
+@app.post("/api/process-ocr/{filename}")
