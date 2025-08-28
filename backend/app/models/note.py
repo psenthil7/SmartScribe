@@ -8,7 +8,7 @@ class NoteCreate(BaseModel):
     filename: Optional[str] = None
 
 class NoteResponse(BaseModel):
-    id: int
+    id: str
     title: str
     content: str
     filename: Optional[str] = None

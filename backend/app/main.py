@@ -33,23 +33,9 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
-# retrieves all notes
-@app.get("/api/notes") 
-async def get_notes():
-    """Get all notes (placeholder for now)"""
-    return {"notes" : [], "message" : "No notes yet"}
+# retrieves all notes - REMOVED DUPLICATE
 
-# create note request
-@app.post("/api/notes")
-async def create_note(note: NoteCreate):
-    """Create a new note"""
-
-    return {
-        "id": 1,
-        "title": note.title,
-        "content": note.content,
-        "message": "Note created successfully"
-    }
+# create note request - REMOVED DUPLICATE
 
 # get request for a specific note
 @app.get("/api/notes/{note_id}")
@@ -161,34 +147,66 @@ async def process_ocr(filename: str):
     # check if file exists 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {filename} not found")
-    
-    try: 
-        # read image with open cv
-        image = cv2.imread(file_path)
-        if image is None:
-            raise HTTPException(status_code=400, detail=f"Invalid image file")
+    try:
+        file_extension = os.path.splitext(filename.lower())[1]
+
+        if file_extension == '.pdf':
+            try:
+                from pdf2image import convert_from_path
+            except ImportError:
+                raise HTTPException(
+                    status_code=500, 
+                    detail="PDF processing requires pdf2image. Install with: pip install pdf2image"
+                )
+
+            # convert pdf to images
+            images = convert_from_path(file_path)
+            all_text = ""
+
+            # Process each page
+            for i, image in enumerate(images):
+                # Convert PIL image to OpenCV format
+                opencv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+                
+                # Convert to grayscale
+                gray = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2GRAY)
+                denoised = cv2.medianBlur(gray, 3)
+                _, threshold = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+                # extract text w tesseract
+                text = pytesseract.image_to_string(threshold)
+                all_text += f"\n--- Page {i+1} ---\n\n{text}"
+            
+            cleaned_text = all_text.strip()
+
+        else: 
+            # read image with open cv
+            image = cv2.imread(file_path)
+            if image is None:
+                raise HTTPException(status_code=400, detail=f"Invalid image file")
         
-        # grayscale so its easier for OCR + preprocessing 
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        denoised = cv2.medianBlur(gray, 3)
-        _, threshold = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            # grayscale so its easier for OCR + preprocessing 
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            denoised = cv2.medianBlur(gray, 3)
+            _, threshold = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-        #extract text w tesseract
-        text = pytesseract.image_to_string(threshold)
-        cleaned_text = text.strip() # clean any whitespace
+            #extract text w tesseract
+            text = pytesseract.image_to_string(threshold)
+            cleaned_text = text.strip() # clean any whitespace
 
+        # Return statement for both PDF and image processing
         return {
             "filename": filename,
             "extracted_text": cleaned_text,
             "confidence": "OCR processing completed",
             "character_count": len(cleaned_text)
         }
-
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"OCR processing failed")
+        raise HTTPException(status_code=500, detail=f"OCR processing failed: {str(e)}")
 
 notes_db = [] # for in memory storage
 
+# creates notee
 @app.post("/api/notes", response_model=NoteResponse)
 async def create_note(note: NoteCreate):
     note_id = str(uuid.uuid4())
@@ -208,7 +226,7 @@ async def get_notes():
 
 embedding_service = EmbeddingService()
 
-@app.pot("/api/generate_embeddings")
+@app.post("/api/generate-embeddings")
 async def generate_embeddings(text: str):
     embedding = embedding_service.generate_embeddings(text)
     return {
@@ -222,11 +240,24 @@ vector_db = VectorDBService()
 @app.post("/api/store-note-with-embeddings")
 async def store_note_with_embeddings(note: NoteCreate):
     # convert text to embedding 
-    embedding = embedding_service.generate_embedding(note.content)
+    embedding = embedding_service.generate_embeddings(note.content)
     
     # store in vector db
     note_id = str(uuid.uuid4())
     metadata = {"title": note.title, "filename": note.filename}
-    vector_db.store_note(note_id, note.content, embedding, metadata)
+    vector_db.store_notes(note_id, note.content, embedding, metadata)
 
     return {"message": "Note stored with embeddings", "note_id": note_id}
+
+@app.post("/api/search")
+async def search_notes(query: str, n_results: int = 3):
+    # create embedding for query
+    query_embedding = embedding_service.generate_embeddings(query)
+
+    # search for similar in vector db
+    results = vector_db.search_similar(query_embedding, n_results)
+
+    return {
+        "query": query,
+        "results": results
+    }

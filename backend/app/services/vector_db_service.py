@@ -4,10 +4,7 @@ from typing import List, Dict, Any
 
 class VectorDBService:
     def __init__(self):
-        self.client = chromadb.Client(Settings(
-            chroma_db_impl="duckdb+parquet", # uses fst parquet file format
-            persist_directory="./chroma_db" # save to folder
-        ))
+        self.client = chromadb.PersistentClient(path = "./chroma_db")
         self.collection = self.client.get_or_create_collection("notes")
     
     # stores note with given parameters
@@ -26,3 +23,4 @@ class VectorDBService:
             n_results = n_results
         )
         return results
+    
