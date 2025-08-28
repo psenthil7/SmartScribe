@@ -86,5 +86,13 @@ def get_file_type(filename: str) -> str:
             return file_type
     return "unknown"
 
+@app.post("/api/upload")
+async def upload_note_file(file: UploadFile = File(...)):
+    """Upload a handwritten note file (image, PDF, etc.)"""
 
-
+    # Validate file type
+    if not is_allowed_file(file.filename):
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type not allowed."
+        )
