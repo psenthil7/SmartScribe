@@ -158,3 +158,16 @@ async def list_uploaded_files():
 
 # OCR processing 
 @app.post("/api/process-ocr/{filename}")
+async def procces_ocr(filename: str):
+    """Processes uploaded file with OCR to extract text"""
+
+    # creates path to uploaded file in uploads directory
+    upload_dir = "uploads"
+    file_path = os.path.join(upload_dir, filename)
+
+    # check if file exists 
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail=f"File {filename} not found")
+    
+    
+
