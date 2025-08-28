@@ -96,3 +96,23 @@ async def upload_note_file(file: UploadFile = File(...)):
             status_code=400,
             detail=f"File type not allowed."
         )
+
+    # creates upload directory if it doesn't already exist
+    upload_dir = "uploads"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    
+    # creates a unique filename w uuid
+    file_extension = file.filename.split('.')[-1]
+    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    file_path = os.path.join(upload_dir, unique_filename) # combines folder and fileName into full path
+
+    # save the file
+    try:
+        with open(file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save fule: {str(e)}")
+
+
