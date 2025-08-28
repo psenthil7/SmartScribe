@@ -1,7 +1,9 @@
-from fastapi import FastAPI, HTTPException 
+from fastapi import FastAPI, HTTPException, UploadFile, File 
 from fastapi.middleware.cors import CORSMiddleware 
 from pydantic import BaseModel # for data validation 
-from typing import List, Optional 
+from typing import List
+import os
+import uuid
 
 app = FastAPI(title="SmartScribe", version="1.0.0")
 
@@ -34,11 +36,13 @@ class Note(BaseModel):
     title: str
     content: str
 
+# retrieves all notes
 @app.get("/api/notes") 
 async def get_notes():
     """Get all notes (placeholder for now)"""
     return {"notes" : [], "message" : "No notes yet"}
 
+# create note request
 @app.post("/api/notes")
 async def create_note(note: NoteCreate):
     """Create a new note"""
@@ -50,7 +54,8 @@ async def create_note(note: NoteCreate):
         "message": "Note created successfully"
     }
 
-@app.get(f"/api/notes/{note_id}")
+# get request for a specific note
+@app.get("/api/notes/{note_id}")
 async def get_note(note_id: int):
     """Get a specific note by ID"""
 
@@ -60,4 +65,26 @@ async def get_note(note_id: int):
         "content": "This is a sample note content",
         "message": "Note retrieved successfully"
     }
+
+ALLOWED_EXTENSIONS = {
+    'image': ['.jpg', '.jpeg', '.png', '.tiff', '.bmp'],
+    'pdf': ['.pdf'],
+    'document': ['.doc', '.docx'] # optional for typed notes
+}
+
+# check if file type is allowed
+def is_allowed_file(filename: str) -> bool:
+    """Check if file extension is allowed"""
+    ext = os.path.splitext(filename.lower())[1]
+    return any(ext in extensions for extensions in ALLOWED_EXTENSIONS.values())
+
+def get_file_type(filename: str) -> str:
+    """Get the type of file based on extension"""
+    ext = os.path.splitext(filename.lower())[1]
+    for file_type, extensions in ALLOWED_EXTENSIONS.items():
+        if ext in extensions:
+            return file_type
+    return "unknown"
+
+
 
