@@ -198,6 +198,7 @@ async def procces_ocr(filename: str):
 async def upload_and_process(file: UploadFile = File(...)):
     """Upload a file and immediately process it with OCR"""
 
+    # check if file type is allowed
     if not is_allowed_file(file.filename):
         allowed_extensions = []
         for extensions in ALLOWED_EXTENSIONS.values():
@@ -207,4 +208,14 @@ async def upload_and_process(file: UploadFile = File(...)):
             detail=f"File type not allowed. Allowed extensions: {', '.join(allowed_extensions)}"
         )
     
+    # upload directory if it doesn't exist 
+    upload_dir = "uploads"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+
+    # create unique filename w uuid and create file_path w name
+    file_extension = file.filename.split('.')[-1]
+    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    file_path = os.path.join(upload_dir, unique_filename)
+
     
