@@ -179,5 +179,7 @@ async def procces_ocr(filename: str):
         denoised = cv2.medianBlur(gray, 3)
         _, threshold = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
-    
+        text = pytesseract.image_to_string(threshold)
+        cleaned_text = text.strip() 
 
+        
