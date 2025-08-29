@@ -13,6 +13,7 @@ from datetime import datetime
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_db_service import VectorDBService
 from app.services.flashcard_service import FlashcardService
+from app.services.rag_service import RAGService
 
 app = FastAPI(title="SmartScribe", version="1.0.0")
 
@@ -280,4 +281,25 @@ async def generate_flashcards(note_id: str):
         "note_id": note_id,
         "flashcards": flashcards
     }
+
+# Initialize RAG service with Cerebras
+rag_service = RAGService()
+
+@app.post("/api/rag-search")
+async def rag_search(query: str, n_results: int = 3):
+    """Search with RAG using Cerebras for intelligent answers"""
+    try:
+        result = rag_service.search_with_context(query, n_results)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RAG search failed: {str(e)}")
+
+@app.post("/api/generate-flashcards-from-search")
+async def generate_flashcards_from_search(query: str, n_results: int = 3, num_cards: int = 5):
+    """Generate flashcards from search results using Cerebras"""
+    try:
+        result = rag_service.generate_flashcards_from_search(query, n_results, num_cards)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Flashcard generation failed: {str(e)}")
 

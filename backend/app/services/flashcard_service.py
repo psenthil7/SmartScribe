@@ -1,14 +1,16 @@
-class FlashcardService:
-    def generate_flashcards(self, content: str) -> List[Dict[str, str]]:
-        # Placeholder, creating simple flashcards for now
+from typing import List, Dict
+from app.services.cerebras_service import CerebrasService
 
-        sentences = content.split('.')
-        flashcards = []
-        
-        for i, sentence in enumerate(sentences[:5]): # limit to 5 flashcards
-            if len(sentence.strip()) > 20:
-                question = f"What is the main point about: {sentence[:50]}...?"
-                answer = sentence.strip()
-                flashcards.append({"question": question, "answer": answer})
-        
-        return flashcards
+class FlashcardService:
+    def __init__(self):
+        self.cerebras_service = CerebrasService()
+    
+    def generate_flashcards(self, content: str, num_cards: int = 5) -> List[Dict]:
+        """Generate flashcards from content using Cerebras"""
+        return self.cerebras_service.generate_flashcards(content, num_cards)
+    
+    def generate_flashcards_from_notes(self, note_ids: List[str], num_cards: int = 5) -> List[Dict]:
+        """Generate flashcards from multiple notes"""
+        # This would need to fetch notes from your database
+        # For now, return empty list
+        return []
