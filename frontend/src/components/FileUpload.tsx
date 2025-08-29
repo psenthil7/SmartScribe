@@ -8,9 +8,10 @@ import {
 } from '@mui/material';
 import { CloudUpload } from '@mui/icons-material';
 import { uploadFile, processOCR } from '../services/api';
+import { FileProcessResult } from '../types';
 
 interface FileUploadProps {
-  onFileProcessed: (data: any) => void;
+  onFileProcessed: (data: FileProcessResult) => void;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileProcessed }) => {
@@ -34,8 +35,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileProcessed }) => {
       const ocrResult = await processOCR(uploadResult.filename);
       
       onFileProcessed({
-        ...uploadResult,
-        ...ocrResult
+        message: uploadResult.message,
+        filename: uploadResult.filename,
+        original_name: uploadResult.original_name,
+        file_path: uploadResult.file_path,
+        file_type: uploadResult.file_type,
+        size_bytes: uploadResult.size_bytes,
+        extracted_text: ocrResult.extracted_text,
+        confidence: ocrResult.confidence,
+        character_count: ocrResult.character_count
       });
       
     } catch (err) {
